@@ -1,0 +1,13 @@
+{
+	"AI": {
+		"type": "dummy"
+	},
+	"IO": {
+		"type_in": "tty",
+		"config_in": { "prompt": "user > " },
+		"type_out": "tty",
+		"config_out": {
+			"prompt": "ai   < "
+		}
+	}
+}
