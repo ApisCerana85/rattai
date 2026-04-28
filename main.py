@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 #i already feel sorry for sombody reading this code. (it was kinda vibecoded)
 
 import subprocess
