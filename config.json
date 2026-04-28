@@ -5,9 +5,11 @@
 	"IO": {
 		"type_in": "tty",
 		"config_in": { "prompt": "user > " },
-		"type_out": "tty",
+		"type_out": "piper",
 		"config_out": {
-			"prompt": "ai   < "
+			"piper_path": ".venv/bin/piper",
+			"model_path": "models/pl_PL-gosia-medium.onnx",
+			"model_config_path": "models/pl_PL-gosia-medium.onnx.json"
 		}
 	}
 }

@@ -8,6 +8,7 @@ use ai::{AIEngine};
 #[derive(Debug)]
 pub enum Error {
     ConfigError(config::ConfigError),
+    OutputError(io::OutputError)
 }
 //use std::fmt;
 //impl fmt::Debug for Error {
@@ -20,7 +21,13 @@ impl From<config::ConfigError> for Error {
         Self::ConfigError(e)
     }
 }
+impl From<io::OutputError> for Error {
+    fn from(e: io::OutputError) -> Error {
+        Self::OutputError(e)
+    }
+}
 
+#[derive(Debug)]
 pub enum ControlActions {
     Quit,
 }
@@ -47,22 +54,21 @@ impl Controller {
         }
     }
 
-    fn parse_response(&mut self, resp: OutputData) {
+    fn parse_response(&mut self, resp: OutputData) -> Result<(), Error> {
         match resp {
-            OutputData::String(_) => self.output.output(&resp),
-            OutputData::Action(action) => self.parse_action(action),
-            //TODO error
-            _ => {}
+            OutputData::String(_) => Ok(self.output.output(&resp)?),
+            OutputData::Action(action) => Ok(self.parse_action(action)),
+            OutputData::Error(e) => Err(e.into()), //TODO error
         }
     }
 
-    pub fn update(&mut self) {
+    pub fn update(&mut self) -> Result<(), Error> {
         let ipt = self.input.get_input();
         let resp: OutputData = match ipt {
             Ok(msg) => self.ai.respond(&msg).into(),
             Err(e)  => e,
         };
-        
-        self.parse_response(resp);
+        self.parse_response(resp)?;
+        Ok(())
     } 
 }

@@ -1,13 +1,13 @@
-use rattatai::{
+use rattai::{
     Controller,
-    io::{Input, Output},
+    Error,
     ai::AIEngine,
     config::Config,
-    Error,
+    io::{Input, Output, OutputError},
 };
 
 fn main() -> Result<(), Error> {
-    use rattatai::io::tty::TTYInputConfig;
+    //use rattai::io::tty::TTYInputConfig;
     //let i = TTYInputConfig {
     //    prompt: "hello: ".to_string()
     //};
@@ -17,12 +17,12 @@ fn main() -> Result<(), Error> {
     let ai: Box<dyn AIEngine> = config.ai.into();
 
     let input: Box<dyn Input> = config.input.into();
-    let output: Box<dyn Output> = config.output.into();
+    let output: Result<Box<dyn Output>, OutputError> = config.output.into();
 
-    let mut controller = Controller::new(ai, input, output); 
+    let mut controller = Controller::new(ai, input, output?); 
 
     while !controller.quit {
-        controller.update();
+        controller.update()?;
     }
     Ok(())
 }

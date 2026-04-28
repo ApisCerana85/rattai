@@ -2,18 +2,17 @@ use serde_json::{Value};
 
 use crate::{
     ai::{
-        chatgpt::ChatGPTConfig,
-        AIEngine, DummyEngine,
-    },
-    io::{
-        tty::{
+        AIEngine, DummyEngine, chatgpt::ChatGPTConfig
+    }, io::{
+        Input, Output, OutputError, tty::{
             TTYIn, TTYInputConfig,
             TTYOut, TTYOutputConfig,
-        },
-        Input,
-        Output
+        }
     }
 };
+
+#[cfg(feature = "piper")]
+use crate::io::piper::{PiperOut, PiperConfig};
 
 #[derive(Debug)]
 pub enum ConfigError {
@@ -26,7 +25,7 @@ impl From<serde_json::Error> for ConfigError {
         match e.classify() {
             Category::Io => ConfigError::File,
             Category::Syntax => ConfigError::Parse(format!("Syntax Error at {}:{}", e.line(), e.column())),
-            Category::Data => ConfigError::Parse(format!("Invalid Data at {}:{}", e.line(), e.column())),
+            Category::Data => ConfigError::Parse(format!("Invalid Data at {}:{} (make sure you have every field)", e.line(), e.column())),
             Category::Eof => ConfigError::Parse(format!("Unexpected EoF {}:{}", e.line(), e.column())),
         }
     }
@@ -86,7 +85,9 @@ impl From<InputConfig> for Box<dyn Input> {
 }
 
 pub enum OutputConfig {
-   TTY(TTYOutputConfig)
+   TTY(TTYOutputConfig),
+   #[cfg(feature = "piper")]
+   Piper(PiperConfig)
 }
 
 impl OutputConfig {
@@ -100,14 +101,22 @@ impl OutputConfig {
                         serde_json::from_value(v["config_out"].clone())? //high cortisol clone
                 ))
             },
-            &_ => Err(ConfigError::Parse("invaild Output type".to_string())),
+            #[cfg(feature = "piper")]
+            "piper" => {
+                Ok(Self::Piper(
+                    serde_json::from_value(v["config_out"].clone())?
+                ))
+            }
+            &_ => Err(ConfigError::Parse("invaild Output type (make sure you have correct features enabled)".to_string())),
         }
     }
 }
-impl From<OutputConfig> for Box<dyn Output> {
-    fn from(c: OutputConfig) -> Box<dyn Output> {
+impl From<OutputConfig> for Result<Box<dyn Output>, OutputError> {
+    fn from(c: OutputConfig) -> Result<Box<dyn Output>, OutputError> {
         match c {
-            OutputConfig::TTY(c) => Box::new(TTYOut::new(c)),
+            OutputConfig::TTY(c) => Ok(Box::new(TTYOut::new(c))),
+            #[cfg(feature = "piper")]
+            OutputConfig::Piper(c) => Ok(Box::new(PiperOut::new(c)?))
         }
     }
 }

@@ -2,12 +2,15 @@ pub mod tty;
 
 #[cfg(feature = "whisper")]
 pub mod whisper;
+
+#[cfg(feature = "piper")]
+pub mod piper;
 //#[cfg(feature = "parakeet")]
 //pub mod parakeet;
 
 use crate::ControlActions;
 
-// #[derive(Copy, Clone)]
+#[derive(Debug)]
 pub enum InputData {
     String(String)
 }
@@ -16,9 +19,10 @@ pub trait Input {
     fn get_input(&mut self) -> Result<InputData, OutputData>;
 }
 
+#[derive(Debug)]
 pub enum OutputData {
     String(String),
-    Error(&'static str),
+    Error(OutputError),
     Action(ControlActions),
 }
 
@@ -31,17 +35,12 @@ impl From<InputData> for OutputData {
     }
 }
 
-pub trait Output {
-    fn output(&mut self, data: &OutputData);
+#[derive(Debug)]
+pub enum OutputError {
+    Other(String),
+    Unsuported
 }
 
-pub struct CustomIO {
-    inpt: Box<dyn Input>,
-    out: Box<dyn Output>,
-}
-impl Input for CustomIO {
-    fn get_input(&mut self) -> Result<InputData, OutputData> { self.inpt.get_input() }
-}
-impl Output for CustomIO {
-    fn output(&mut self, data: &OutputData) { self.out.output(data) }
+pub trait Output {
+    fn output(&mut self, data: &OutputData) -> Result<(), OutputError>;
 }

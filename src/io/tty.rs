@@ -2,7 +2,7 @@ use std::{
     io,
     io::Write
 };
-use crate::io::{Input, InputData, Output, OutputData};
+use crate::io::{Input, InputData, Output, OutputData, OutputError};
 use serde::Deserialize;
 use serde::Serialize;
 #[derive(Deserialize, Serialize, Debug)]
@@ -30,7 +30,7 @@ impl Input for TTYIn {
         let mut input = String::new();
         self.stdout.flush();
         self.stdin.read_line(&mut input)
-            .map_err(|_| OutputData::Error("read_line"))?;
+            .map_err(|_| OutputData::Error(OutputError::Other("couldn't read stdin".to_string())))?;
 
         return Ok(InputData::String(input.trim_end().to_string()))
     }
@@ -56,11 +56,12 @@ impl TTYOut {
 }
 
 impl Output for TTYOut {
-    fn output(&mut self, data: &OutputData) {
+    fn output(&mut self, data: &OutputData) -> Result<(), OutputError> {
         match data {
             OutputData::String(d) => println!("{} {}", self.prompt, d),
-            OutputData::Error(e) => println!("ERR! {}", e),
+            OutputData::Error(e) => println!("ERR! {:?}", e),
             _ => {},
-        }
+        };
+        Ok(())
     }
 }

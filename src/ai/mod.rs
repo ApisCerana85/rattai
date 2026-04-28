@@ -36,7 +36,7 @@ impl AIEngine for DummyEngine {
     fn respond(&self, msg: &InputData) -> OutputData {
        match msg {
             InputData::String(d) => self.parse_string(d.to_string()),
-            _ => OutputData::Error("unsuported!")
+            _ => OutputData::Error(crate::io::OutputError::Unsuported)
        } 
     }
 }
