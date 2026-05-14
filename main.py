@@ -6,7 +6,7 @@ from input.listen import Listener
 from output.respond import Responder
 from parser.parse import *
 
-EXIT_KEYWORDS = ["quit", "q", "exit"]
+EXIT_KEYWORDS = ["quit", "q", "exit", "wyłącz"]
 WAKE_KEYWORDS = ["hej", "hejka"]
 
 def main():
@@ -19,14 +19,14 @@ def main():
 
     responder = Responder(quit_event)
 
-    parser = DummyParser()
+    parser = DummyParser(EXIT_KEYWORDS)
 
     while not quit_event.is_set():
         inpt = listen_thread.get_nowait()
         action = parser.parse(inpt)
         responder.respond(action)
 
-    print("closing program...")
+    print("closing program... (you propably need to press enter one more time)")
     sys.exit()
 
 if __name__ == "__main__":
