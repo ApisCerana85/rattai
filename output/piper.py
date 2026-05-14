@@ -3,8 +3,6 @@ import sounddevice as sd
 import soundfile as sf
 import numpy as np
 
-import input.types as in_types
-
 class Piper():
     PATH:        str # path to piper executable
     MODEL:       str # path to piper speech model
@@ -24,7 +22,7 @@ class Piper():
         self.SAMPLE_RATE = sample_rate
 
     def say(self, inpt: str):
-        print(f"saying > {inpt}")
+        print(f"piper > {inpt}")
         with sd.RawOutputStream(
             samplerate=self.SAMPLE_RATE,
             channels=1,

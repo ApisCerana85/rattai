@@ -1,25 +1,20 @@
 import threading
 from output.piper import Piper
-import input.types as in_types
-from parse.parse import ParserEngine, DummyParser
+import parser.types as parse_types
+from parser.parse import ParserEngine, DummyParser
 
 class Responder():
     quit_event: threading.Event
-    parser: ParserEngine
     piper: Piper
 
-    def __init__(self, quit_event: threading.Event, parser_engine: str):
+    def __init__(self, quit_event: threading.Event):
         self.piper = Piper()
         self.quit_event = quit_event
-        #match parser_engine:
-        #    case "dummy": self.parser=DummyParser()
-        self.parser = DummyParser()
 
-    def respond(self, inpt: UserInput):
-        match inpt:
-            case in_types.Text():
-                outpt = self.parser.respond(inpt)
-                self.piper.say(outpt)
-            case in_types.Exit(): 
+    def respond(self, action: ParseOutput):
+        match action:
+            case parse_types.Text():
+                self.piper.say(action.text)
+            case parse_types.Exit(): 
                 self.quit_event.set()
             case None: pass

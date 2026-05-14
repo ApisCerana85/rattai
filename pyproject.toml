@@ -1,6 +1,6 @@
 [project]
 name = "rattatai"
-version = "0.0.1"
+version = "0.0.2"
 description = "kitchen asistant utilizing the power of AI"
 readme = "README.md"
 requires-python = ">=3.14"

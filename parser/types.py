@@ -1,9 +1,9 @@
-class UserOutput(): pass
+class ParseOutput(): pass
 
-class Text(UserInput):
+class Text(ParseOutput):
     text: str
     def __init__(self, text: str):
         self.text = text
 
-class Exit(UserInput):
+class Exit(ParseOutput):
     pass

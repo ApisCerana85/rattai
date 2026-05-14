@@ -1,28 +1,28 @@
 import threading
 import queue
-import input.types as in_types
+import re
 
 class Listener(threading.Thread):
     input_queue:   queue.Queue
     quit_event:    threading.Event
     WAKE_KEYWORDS: [str]
 
-    def __init__(self, quit_event: threading.Event, exit_keywords: [str], wake_keywords: [str]):
+    def __init__(self, quit_event: threading.Event, wake_keywords: [str]):
         super().__init__(daemon=True)
         
         self.input_queue = queue.Queue()
         self.quit_event = quit_event
-        self.EXIT_KEYWORDS = exit_keywords
         self.WAKE_KEYWORDS = wake_keywords
     
     def run(self):
         while not self.quit_event.is_set():
             try:
-                text = input()
-                if text in self.EXIT_KEYWORDS:
-                    self.input_queue.put(in_types.Exit())
-                else:
-                    self.input_queue.put(in_types.Text(text))
+                text = input("user: ")
+
+                #definetly not optimal
+                for word in text.split():
+                    if word in self.WAKE_KEYWORDS:    
+                        self.input_queue.put(text)
             except EOFError:
                 self.quit_event.set()
     
