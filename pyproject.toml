@@ -1,0 +1,12 @@
+[project]
+name = "rattatai"
+version = "0.0.1"
+description = "kitchen asistant utilizing the power of AI"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "numpy>=2.4.4",
+    "piper-tts>=1.4.2",
+    "sounddevice>=0.5.5",
+    "soundfile>=0.13.1",
+]
